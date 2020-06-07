@@ -485,6 +485,10 @@ int main(int argc, char* argv[])
             }  
 		}
 	}
+	for (int j = 0; j < n_bas; j++)
+	{
+	    std::cout << "value of basis function " << i+1 << ": at point "<<j+1 <<" is :"<< rectangle_basis_function[i].value(lv[j], lv) << std::endl;
+	}
 	///　用代数多重网格(AMG)计算线性方程
 	AMGSolver solver(stiff_mat);
     /// 这里设置线性求解器的收敛判定为机器 epsilon 乘以矩阵的阶数，也
