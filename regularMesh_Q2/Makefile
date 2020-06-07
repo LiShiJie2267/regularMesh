@@ -7,15 +7,12 @@ object = $(patsubst %.cpp, %.o, $(source))
 LDFLAGS += -L/usr/local/AFEPack/library/lib -lAFEPack
 
 #all : 
+main : $(object)
+	$(CXX) -o $@ possion_equation.o $(LDFLAGS) $(LIBS)
 
 %.o : %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-step1 : $(object)
-	$(CXX) -o $@ step1.o $(LDFLAGS) $(LIBS)
-
-step2 : $(object)
-	$(CXX) -o $@ step2.o $(LDFLAGS) $(LIBS)
 
 clean :
 	-rm -rf $(object)
