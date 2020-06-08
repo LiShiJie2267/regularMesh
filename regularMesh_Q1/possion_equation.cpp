@@ -1,7 +1,7 @@
 /**
- * @file   step2.cpp
- * @author Wang Heyu <hywang@sixears>
- * @date   Tue Jun  2 17:01:24 2020
+ * @file   _possion_equation.cpp
+ * @author Li ShiJie <lsj@lsj>
+ * @date   Tue Jun  3 9:04:24 2020
  * 
  * @brief  尝试将 AFEPack 对接到我们在 step1 中产生的矩形区域的矩形网格上。
  * 
@@ -9,6 +9,7 @@
  */
 #include <iostream>
 #include <cmath>
+#include <unordered_map>
 #include <AFEPack/AMGSolver.h>
 #include <AFEPack/Geometry.h>
 #include <AFEPack/TemplateElement.h>
@@ -41,6 +42,7 @@ double f(const double * p)
 	//return -5 * u( p );
 }; 
 
+typedef std::unordered_map<unsigned int,int> index_map;
 int main(int argc, char* argv[])
 {
     /// 这里基本上和 possion_equation 中配置一致。对比
@@ -91,7 +93,7 @@ int main(int argc, char* argv[])
     double x1 = 1.0;
     double y1 = 1.0;
 	/// 设置剖分断数和节点总数
-    int n = 200;
+    int n = 20;
 	int dim=(n+1)*(n+1);
 
 	Vector<double> rhs(dim);
@@ -120,22 +122,10 @@ int main(int argc, char* argv[])
 	    int idx10 = j * (n + 1) + i + 1; 
 	    int idx11 = (j + 1) * (n + 1) + i + 1; 
 	    int idx01 = (j + 1) * (n + 1) + i; 
-		sp_stiff_matrix.add(idx00,idx00);
-		sp_stiff_matrix.add(idx00,idx10);
-		sp_stiff_matrix.add(idx00,idx11);
-		sp_stiff_matrix.add(idx00,idx01);
-		sp_stiff_matrix.add(idx10,idx00);
-		sp_stiff_matrix.add(idx10,idx10);
-		sp_stiff_matrix.add(idx10,idx11);
-		sp_stiff_matrix.add(idx10,idx01);
-		sp_stiff_matrix.add(idx11,idx00);
-		sp_stiff_matrix.add(idx11,idx10);
-		sp_stiff_matrix.add(idx11,idx11);
-		sp_stiff_matrix.add(idx11,idx01);
-		sp_stiff_matrix.add(idx01,idx00);
-		sp_stiff_matrix.add(idx01,idx10);
-		sp_stiff_matrix.add(idx01,idx11);
-		sp_stiff_matrix.add(idx01,idx01);
+		index_map index({{0,idx00},{1,idx10},{2,idx11},{3,idx01}},template_element.n_dof());
+		for(int i = 0;i < template_element.n_dof(); i++)
+			for(int j = 0;j < template_element.n_dof(); j++)
+				sp_stiff_matrix.add(index[i],index[j]);
 	}
 	sp_stiff_matrix.compress();
 	SparseMatrix<double> stiff_mat(sp_stiff_matrix);
@@ -157,7 +147,7 @@ int main(int argc, char* argv[])
 	    double y01 = ((n - j - 1) * y0 + (j + 1) * y1) / n;
 	    int idx01 = (j + 1) * (n + 1) + i; 
 	    
-	    int ele_idx = j * n + i;
+	    //int ele_idx = j * n + i;
 
 	    gv[0][0] = x00;
 	    gv[0][1] = y00;
@@ -191,49 +181,18 @@ int main(int argc, char* argv[])
 		{
 		auto point=rectangle_coord_transform.local_to_global(q_point, lv, gv);
 		double Jxy=quad_info.weight(l)*rectangle_coord_transform.local_to_global_jacobian(q_point[l], lv, gv)*volume;
-
-		stiff_mat.add(idx00,idx00,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv)
-													,rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx00,idx10,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv)
-													,rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx00,idx11,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv)
-													,rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx00,idx01,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv)
-													,rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx10,idx00,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv)
-													,rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx10,idx10,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv)
-													,rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx10,idx11,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv)
-													,rectangle_basis_function[2].gradient(point[l],gv)));																																																	
-		stiff_mat.add(idx10,idx01,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv)
-													,rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx11,idx00,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv)
-													,rectangle_basis_function[0].gradient(point[l],gv)));										
-		stiff_mat.add(idx11,idx10,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv)
-													,rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx11,idx11,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv)
-													,rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx11,idx01,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv)
-													,rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx01,idx00,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv)
-													,rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx01,idx10,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv)
-													,rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx01,idx11,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv)
-													,rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx01,idx01,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv)
-													,rectangle_basis_function[3].gradient(point[l],gv)));	
-		//合成右端项
-		rhs(idx00)+=Jxy*f(point[l])*rectangle_basis_function[0].value(point[l],gv);
-		rhs(idx10)+=Jxy*f(point[l])*rectangle_basis_function[1].value(point[l],gv);
-		rhs(idx11)+=Jxy*f(point[l])*rectangle_basis_function[2].value(point[l],gv);
-		rhs(idx01)+=Jxy*f(point[l])*rectangle_basis_function[3].value(point[l],gv);
+		index_map index({{0,idx00},{1,idx10},{2,idx11},{3,idx01}},template_element.n_dof());
+		for(int base1 = 0;base1 < template_element.n_dof(); base1++)
+		{
+			for(int base2 = 0;base2 < template_element.n_dof(); base2++)
+				stiff_mat.add(index[base1],index[base2],Jxy*innerProduct(rectangle_basis_function[base1].gradient(point[l],gv),rectangle_basis_function[base2].gradient(point[l],gv)));
+			rhs(index[base1])+=Jxy*f(point[l])*rectangle_basis_function[base1].value(point[l],gv);
+		}
 		}
 		/// TO DO: 计算每个积分点上的基函数梯度值，数值积分，拼装局部刚度矩阵，累加至整体刚度矩阵。
 	}
 	///处理所有边界条件
-	for(unsigned int index=0;index<dim;index++)
+	for(unsigned int index=0;index < dim;index++)
 	{
 		if(nozeroperow[index]==4||nozeroperow[index]==6)
 		{	
