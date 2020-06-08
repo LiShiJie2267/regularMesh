@@ -9,6 +9,7 @@
  */
 #include <iostream>
 #include <cmath>
+#include <unordered_map>
 #include <AFEPack/AMGSolver.h>
 #include <AFEPack/Geometry.h>
 #include <AFEPack/TemplateElement.h>
@@ -42,6 +43,8 @@ double f(const double * p)
 	return 5 * PI * PI* u( p );
 }; 
 
+typedef std::unordered_map<unsigned int,int> index_map;
+
 int main(int argc, char* argv[])
 {
     /// 这里基本上和 possion_equation 中配置一致。对比
@@ -62,12 +65,12 @@ int main(int argc, char* argv[])
 			    rectangle_basis_function);
 
     double volume = template_element.volume();
-    /// 取了 2 次代数精度。
     const QuadratureInfo<2>& quad_info = template_element.findQuadratureInfo(4);
     int n_quadrature_point = quad_info.n_quadraturePoint();
     std::vector<AFEPack::Point<2> > q_point = quad_info.quadraturePoint();
-    int n_element_dof = template_element.n_dof();
+	int n_element_dof = template_element.n_dof();
     int n_bas = rectangle_basis_function.size();
+
     /// 产生一个具体单元顶点的缓存。
     double ** arr = (double **) new double* [9];
     for (int i = 0; i < 9; i++)
@@ -75,8 +78,6 @@ int main(int argc, char* argv[])
     std::vector<AFEPack::Point<2> > gv(9);
     std::vector<AFEPack::Point<2> > lv(9);
 
-    /// 观察一下模板单元中的自由度、基函数和基函数在具体积分点取值的情
-    /// 况。
     for (int i = 0; i < n_element_dof; i++)
     {
 	AFEPack::Point<2> pnt = q_point[i];
@@ -104,7 +105,7 @@ int main(int argc, char* argv[])
     double ya = 0.0;
     double xb = 1.0;
     double yb = 1.0;
-    int n = 50;
+    int n = 10;
 	int dim = (2 * n + 1) * (2 * n + 1);
 	
 	Vector<double> rhs(dim);
@@ -123,8 +124,6 @@ int main(int argc, char* argv[])
 		boundary[(2 * n + 1) * i + 2 * n] = 1;
 
 	}
-	//for(int i=0;i<dim;i++)
-		//std::cout<<boundary[i]<<std::endl;
 	std::vector<unsigned int> nozeroperow(dim);
 	
 	for(int i = 0;i <dim;i++)
@@ -151,9 +150,6 @@ int main(int argc, char* argv[])
 		for(int j = 2 ;j < 2 * n ;j = j + 2)
 			nozeroperow[i *(2 * n + 1) + j] = dim;
 
-	//FullMatrix<double> stiff_mat(dim,dim);
-	//for(int i=0;i<dim;i++)
-		//std::cout<<nozeroperow[i]<<std::endl;
 	SparsityPattern sp_stiff_matrix(dim, nozeroperow);
 	for (int j = 0; j < n; j++)
 		for (int i = 0; i < n; i++)
@@ -167,95 +163,10 @@ int main(int argc, char* argv[])
 			int idx6 = (2 * j + 2) * (2 * n + 1) + (2 * i + 1) ;
 			int idx7 = (2 * j + 1) * (2 * n + 1) + (2 * i) ;
 			int idx8 = (2 * j + 1) * (2 * n + 1) + (2 * i + 1) ;
-			sp_stiff_matrix.add(idx0,idx0);
-			sp_stiff_matrix.add(idx0,idx1);
-			sp_stiff_matrix.add(idx0,idx2);
-			sp_stiff_matrix.add(idx0,idx3);
-			sp_stiff_matrix.add(idx0,idx4);
-			sp_stiff_matrix.add(idx0,idx5);
-			sp_stiff_matrix.add(idx0,idx6);
-			sp_stiff_matrix.add(idx0,idx7);
-			sp_stiff_matrix.add(idx0,idx8);
-
-			sp_stiff_matrix.add(idx1,idx0);
-			sp_stiff_matrix.add(idx1,idx1);
-			sp_stiff_matrix.add(idx1,idx2);
-			sp_stiff_matrix.add(idx1,idx3);
-			sp_stiff_matrix.add(idx1,idx4);
-			sp_stiff_matrix.add(idx1,idx5);
-			sp_stiff_matrix.add(idx1,idx6);
-			sp_stiff_matrix.add(idx1,idx7);
-			sp_stiff_matrix.add(idx1,idx8);
-
-			sp_stiff_matrix.add(idx2,idx0);
-			sp_stiff_matrix.add(idx2,idx1);
-			sp_stiff_matrix.add(idx2,idx2);
-			sp_stiff_matrix.add(idx2,idx3);
-			sp_stiff_matrix.add(idx2,idx4);
-			sp_stiff_matrix.add(idx2,idx5);
-			sp_stiff_matrix.add(idx2,idx6);
-			sp_stiff_matrix.add(idx2,idx7);
-			sp_stiff_matrix.add(idx2,idx8);
-
-			sp_stiff_matrix.add(idx3,idx0);
-			sp_stiff_matrix.add(idx3,idx1);
-			sp_stiff_matrix.add(idx3,idx2);
-			sp_stiff_matrix.add(idx3,idx3);
-			sp_stiff_matrix.add(idx3,idx4);
-			sp_stiff_matrix.add(idx3,idx5);
-			sp_stiff_matrix.add(idx3,idx6);
-			sp_stiff_matrix.add(idx3,idx7);
-			sp_stiff_matrix.add(idx3,idx8);
-
-			sp_stiff_matrix.add(idx4,idx0);
-			sp_stiff_matrix.add(idx4,idx1);
-			sp_stiff_matrix.add(idx4,idx2);
-			sp_stiff_matrix.add(idx4,idx3);
-			sp_stiff_matrix.add(idx4,idx4);
-			sp_stiff_matrix.add(idx4,idx5);
-			sp_stiff_matrix.add(idx4,idx6);
-			sp_stiff_matrix.add(idx4,idx7);
-			sp_stiff_matrix.add(idx4,idx8);
-
-			sp_stiff_matrix.add(idx5,idx0);
-			sp_stiff_matrix.add(idx5,idx1);
-			sp_stiff_matrix.add(idx5,idx2);
-			sp_stiff_matrix.add(idx5,idx3);
-			sp_stiff_matrix.add(idx5,idx4);
-			sp_stiff_matrix.add(idx5,idx5);
-			sp_stiff_matrix.add(idx5,idx6);
-			sp_stiff_matrix.add(idx5,idx7);
-			sp_stiff_matrix.add(idx5,idx8);
-
-			sp_stiff_matrix.add(idx6,idx0);
-			sp_stiff_matrix.add(idx6,idx1);
-			sp_stiff_matrix.add(idx6,idx2);
-			sp_stiff_matrix.add(idx6,idx3);
-			sp_stiff_matrix.add(idx6,idx4);
-			sp_stiff_matrix.add(idx6,idx5);
-			sp_stiff_matrix.add(idx6,idx6);
-			sp_stiff_matrix.add(idx6,idx7);
-			sp_stiff_matrix.add(idx6,idx8);
-
-			sp_stiff_matrix.add(idx7,idx0);
-			sp_stiff_matrix.add(idx7,idx1);
-			sp_stiff_matrix.add(idx7,idx2);
-			sp_stiff_matrix.add(idx7,idx3);
-			sp_stiff_matrix.add(idx7,idx4);
-			sp_stiff_matrix.add(idx7,idx5);
-			sp_stiff_matrix.add(idx7,idx6);
-			sp_stiff_matrix.add(idx7,idx7);
-			sp_stiff_matrix.add(idx7,idx8);
-
-			sp_stiff_matrix.add(idx8,idx0);
-			sp_stiff_matrix.add(idx8,idx1);
-			sp_stiff_matrix.add(idx8,idx2);
-			sp_stiff_matrix.add(idx8,idx3);
-			sp_stiff_matrix.add(idx8,idx4);
-			sp_stiff_matrix.add(idx8,idx5);
-			sp_stiff_matrix.add(idx8,idx6);
-			sp_stiff_matrix.add(idx8,idx7);
-			sp_stiff_matrix.add(idx8,idx8);
+			index_map index({{0,idx0},{1,idx1},{2,idx2},{3,idx3},{4,idx4},{5,idx5},{6,idx6},{7,idx7},{8,idx8}},template_element.n_dof());
+			for(int i = 0;i < template_element.n_dof(); i++)
+				for(int j = 0;j < template_element.n_dof(); j++)
+					sp_stiff_matrix.add(index[i],index[j]);
 		}
 
 	sp_stiff_matrix.compress();
@@ -312,121 +223,32 @@ int main(int argc, char* argv[])
 	    gv[7][0] = x7;gv[7][1] = y7;
 	    gv[8][0] = x8;gv[8][1] = y8;
 
+	    // 现在尝试输出具体每个单元的积分点。
 	   for (int l = 0; l < n_quadrature_point; l++)
 		{
 		auto point=rectangle_coord_transform.local_to_global(q_point, lv, gv);
-		//std::cout<<quad_info.weight(l)<<std::endl;
-		//std::cout<<rectangle_coord_transform.local_to_global_jacobian(q_point[l], lv, gv)<<std::endl;
 		double Jxy=quad_info.weight(l)*rectangle_coord_transform.local_to_global_jacobian(q_point[l], lv, gv)*volume;
-	    stiff_mat.add(idx0,idx0,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx1,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx2,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx3,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx4,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx5,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx6,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx7,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx0,idx8,Jxy*innerProduct(rectangle_basis_function[0].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx1,idx0,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx1,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx2,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx3,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx4,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx5,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx6,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx7,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx1,idx8,Jxy*innerProduct(rectangle_basis_function[1].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx2,idx0,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx1,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx2,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx3,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx4,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx5,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx6,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx7,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx2,idx8,Jxy*innerProduct(rectangle_basis_function[2].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx3,idx0,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx1,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx2,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx3,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx4,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx5,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx6,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx7,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx3,idx8,Jxy*innerProduct(rectangle_basis_function[3].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx4,idx0,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx1,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx2,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx3,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx4,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx5,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx6,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx7,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx4,idx8,Jxy*innerProduct(rectangle_basis_function[4].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx5,idx0,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx1,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx2,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx3,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx4,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx5,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx6,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx7,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx5,idx8,Jxy*innerProduct(rectangle_basis_function[5].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-
-		stiff_mat.add(idx6,idx0,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx1,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx2,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx3,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx4,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx5,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx6,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx7,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx6,idx8,Jxy*innerProduct(rectangle_basis_function[6].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx7,idx0,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx1,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx2,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx3,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx4,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx5,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx6,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx7,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx7,idx8,Jxy*innerProduct(rectangle_basis_function[7].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		stiff_mat.add(idx8,idx0,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[0].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx1,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[1].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx2,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[2].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx3,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[3].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx4,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[4].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx5,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[5].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx6,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[6].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx7,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[7].gradient(point[l],gv)));
-		stiff_mat.add(idx8,idx8,Jxy*innerProduct(rectangle_basis_function[8].gradient(point[l],gv),rectangle_basis_function[8].gradient(point[l],gv)));
-		
-		rhs(idx0)+=Jxy*f(point[l])*rectangle_basis_function[0].value(point[l],gv);
-		rhs(idx1)+=Jxy*f(point[l])*rectangle_basis_function[1].value(point[l],gv);
-		rhs(idx2)+=Jxy*f(point[l])*rectangle_basis_function[2].value(point[l],gv);
-		rhs(idx3)+=Jxy*f(point[l])*rectangle_basis_function[3].value(point[l],gv);
-		rhs(idx4)+=Jxy*f(point[l])*rectangle_basis_function[4].value(point[l],gv);
-		rhs(idx5)+=Jxy*f(point[l])*rectangle_basis_function[5].value(point[l],gv);
-		rhs(idx6)+=Jxy*f(point[l])*rectangle_basis_function[6].value(point[l],gv);
-		rhs(idx7)+=Jxy*f(point[l])*rectangle_basis_function[7].value(point[l],gv);
-		rhs(idx8)+=Jxy*f(point[l])*rectangle_basis_function[8].value(point[l],gv);
-		}/// TO DO: 计算每个积分点上的基函数梯度值，数值积分，拼装局部刚度矩阵，累加至整体刚度矩阵。
+		index_map index({{0,idx0},{1,idx1},{2,idx2},{3,idx3},{4,idx4},{5,idx5},{6,idx6},{7,idx7},{8,idx8}},template_element.n_dof());
+		for(int base1 = 0;base1 < template_element.n_dof(); base1++)
+		{
+			for(int base2 = 0;base2 < template_element.n_dof(); base2++)
+				stiff_mat.add(index[base1],index[base2],Jxy*innerProduct(rectangle_basis_function[base1].gradient(point[l],gv),rectangle_basis_function[base2].gradient(point[l],gv)));
+			rhs(index[base1])+=Jxy*f(point[l])*rectangle_basis_function[base1].value(point[l],gv);
+		}
+	   
+		}
 	}
+
 	for(int j=0;j<=2*n;j++)
 	for(int i=0;i<=2*n;i++)
 	{
 		int index = j * ( 2 * n + 1 ) + i;
 		if(boundary[index]==1)
 		{	
+			std::cout<<index<<std::endl;
 			double x =((2 * n - i )* xa + i * xb)/( 2 * n);
 			double y =((2 * n - j )* ya + j * yb)/( 2 * n);
+			std::cout<<"("<<x<<","<<y<<")"<<std::endl;
 			SparseMatrix<double>::iterator row_iterator = stiff_mat.begin(index);
     	    SparseMatrix<double>::iterator row_end = stiff_mat.end(index);
     	    double diag = row_iterator->value();
@@ -460,7 +282,7 @@ int main(int argc, char* argv[])
     /// 就是自由度总数。这个参数基本上是理论可以达到的极限。
 	Vector<double> solution(dim);
     double tol = std::numeric_limits<double>::epsilon() * dim;
-    solver.solve(solution, rhs, tol, 10000);	
+    solver.solve(solution, rhs, tol, 10000);
 	std::ofstream fs;
 	///　输出到output.m用Matlab或Octave运行，得到计算结果
 	fs.open("output.m");
@@ -479,6 +301,4 @@ int main(int argc, char* argv[])
 	fs<<"surf(x,y,U);"<<std::endl;
 
     return 0;
-    /// 边界条件。
-    /// 矩阵求解。
 };

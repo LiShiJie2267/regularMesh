@@ -19,5 +19,6 @@ clean :
 	-rm -rf main
 	-rm -f *.[nes]
 	-rm -f *.dx
+	-rm -f *.m
 
 .PHONY : default clean
