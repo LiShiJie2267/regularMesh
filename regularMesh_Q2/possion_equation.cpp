@@ -1,9 +1,10 @@
 /**
  * @file   step2.cpp
- * @author Wang Heyu <hywang@sixears>
- * @date   Tue Jun  2 17:01:24 2020
+ * @author Lsj <Lsj@Lsj>
+ * @date   Tue Jun  5 9:12:34 2020
  * 
- * @brief  尝试将 AFEPack 对接到我们在 step1 中产生的矩形区域的矩形网格上。
+ * @brief  利用AFEPack里的函数以及功能，划分结构化网格，使用lagrange九节点二次基函数
+ * 		　　，实现Possion方程编值问题计算．
  * 
  * 
  */
