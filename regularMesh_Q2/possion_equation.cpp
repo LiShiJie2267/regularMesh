@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
     /// 这里基本上和 possion_equation 中配置一致。对比
     /// possion_equation_manual 看更清楚。
     TemplateGeometry<2> rectangle_template_geometry;
-    rectangle_template_geometry.readData("rectangleregular.tmp_geo");
+    rectangle_template_geometry.readData("rectangle.tmp_geo");
     CoordTransform<2, 2> rectangle_coord_transform;
     rectangle_coord_transform.readData("rectangle.crd_trs");
     TemplateDOF<2> rectangle_template_dof(rectangle_template_geometry);
