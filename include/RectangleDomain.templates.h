@@ -61,6 +61,25 @@ typedef std::vector<loacl_to_global_map>  RectangleDomain_Mesh;
     point_coord.push_back(y);\
     point_coord.push_back(z);\
 }
+TEMPLATE
+
+RectangleDomain<D>::RectangleDomain()
+{
+ switch (D)
+    {
+        case 1:
+            mode="L1";
+            break;
+        case 2:
+            mode="Q1";
+            break;
+        case 3:
+            mode="H1";
+            break;
+        default:
+            break;
+    }
+};
 
 TEMPLATE
 RectangleDomain<D>::RectangleDomain(const AFEPack::Point<D> p1,
@@ -72,6 +91,20 @@ RectangleDomain<D>::RectangleDomain(const AFEPack::Point<D> p1,
                                      top_right_point = p2;
                                      Divide_vector=d;
                                      interval_length=length;
+                                     switch (D)
+                                     {
+                                     case 1:
+                                            mode="L1";
+                                            break;
+                                     case 2:
+                                            mode="Q1";
+                                            break;
+                                     case 3:
+                                            mode="H1";
+                                            break;
+                                     default:
+                                         break;
+                                     }
                                  };
 
 TEMPLATE
@@ -86,6 +119,20 @@ RectangleDomain<D>::RectangleDomain(const AFEPack::Point<D> p1,
                                     {   
                                         interval_length.push_back((p2[i] - p1[i])/Divide_vector[i]);
                                     }
+                                    switch (D)
+                                     {
+                                     case 1:
+                                            mode="L1";
+                                            break;
+                                     case 2:
+                                            mode="Q1";
+                                            break;
+                                     case 3:
+                                            mode="H1";
+                                            break;
+                                     default:
+                                         break;
+                                     }
                                  };
 
 TEMPLATE        
@@ -170,20 +217,20 @@ void RectangleDomain<D>::generate_mesh()
     std::cout<<"                   ...                   "<<std::endl;
     switch (D)
     {
-    case 1:
-    for(int i = 0;i < Divide_vector[0];i++)
-    {   
-        loacl_to_global_map loacl_global_map;
-        generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i,0);
-        generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i + 1,1);
-        Mesh.push_back(loacl_global_map);
-    }
-    break;
+    case 1: 
+     if(mode=="L1")
+        for(int i = 0;i < Divide_vector[0];i++)
+        {   
+            loacl_to_global_map loacl_global_map;
+            generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i,0);
+            generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i + 1,1);
+            Mesh.push_back(loacl_global_map);
+        }
     case 2:
-    for(int j = 0;j < Divide_vector[1];j++)
-    for(int i = 0;i < Divide_vector[0];i++)
-    {
-        int ele_idx = j * Divide_vector[0] + i;
+    if(mode=="Q1")
+        for(int j = 0;j < Divide_vector[1];j++)
+        for(int i = 0;i < Divide_vector[0];i++)
+        {
 		loacl_to_global_map loacl_global_map;
 		generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
                         top_right_point[1],i,j,0);
@@ -194,7 +241,59 @@ void RectangleDomain<D>::generate_mesh()
 		generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
                         top_right_point[1],i,j + 1,3);
 		Mesh.push_back(loacl_global_map);
-    }
+        }
+    else if(mode=="Q2")
+        for (int j = 0; j < Divide_vector[1]; j++)
+		for (int i = 0; i < Divide_vector[0]; i++)
+		{
+		loacl_to_global_map loacl_global_map;
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],2 * i,2 * j,0);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 2),2 * j,1);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 2),(2 * j + 2),2);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],2 * i,(2 * j + 2),3);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 1),2 * j,4);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 2),(2 * j + 1),5);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 1),(2 * j + 2),6);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],2 * i,(2 * j + 1),7);
+		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 1),(2 * j + 1),8);
+		Mesh.push_back(loacl_global_map);
+		}
+    else if(mode=="P1")
+        {
+        for (int j = 0; j < Divide_vector[1]; j++)
+		for (int i = 0; i < Divide_vector[0]; i++)
+		{
+        loacl_to_global_map loacl_global_map;
+        generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],i,j,0);
+        generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],i+1,j,1);
+        generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],i,j+1,2);
+        Mesh.push_back(loacl_global_map);       
+        }
+        for (int j = 0; j < Divide_vector[1]; j++)
+		for (int i = 0; i < Divide_vector[0]; i++)
+		{
+        loacl_to_global_map loacl_global_map;
+        generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],i+1,j+1,0);
+        generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],i,j+1,1);
+        generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],i+1,j,2);
+        Mesh.push_back(loacl_global_map);       
+        }
+        }
     break;
     case 3:
     for(int k = 0;k < Divide_vector[2];k++)
@@ -220,7 +319,6 @@ void RectangleDomain<D>::generate_mesh()
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
                         bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,7);
         Mesh.push_back(loacl_global_map);
-
     }
     default:
         break;

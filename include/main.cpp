@@ -10,7 +10,8 @@ int main()
     std::cout<<mesh1D<<std::endl;
 
     RectangleDomain<2> mesh2D;
-    mesh2D.initial_2D_rectangle_domain(0.0,1.0,0.0,1.0,2,4);
+    mesh2D.initial_2D_rectangle_domain(0.0,1.0,0.0,1.0,2,2);
+    mesh2D.set_divide_mode("P1");
     mesh2D.generate_mesh();
     std::cout<<mesh2D<<std::endl;
 

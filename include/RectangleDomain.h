@@ -4,7 +4,6 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
-#include <utility>
 #include <string>
 #include <AFEPack/Geometry.h>
 
@@ -13,7 +12,9 @@
 
 typedef std::pair<std::vector<double>,unsigned int > pointcoord;
 typedef std::map<pointcoord,unsigned int > loacl_to_global_map;
+typedef loacl_to_global_map::iterator index_iterator;
 typedef std::vector<loacl_to_global_map>  RectangleDomain_Mesh;
+typedef std::vector<loacl_to_global_map>::iterator element_iterator;
 
 TEMPLATE_RECTANGLEDOMAIN
 class RectangleDomain
@@ -24,10 +25,10 @@ class RectangleDomain
     std::vector<int> Divide_vector;
     std::vector<double> interval_length;
     RectangleDomain_Mesh Mesh;
+    std::string mode;
     public:
 
-    RectangleDomain()
-    {};
+    RectangleDomain();
     RectangleDomain(const AFEPack::Point<D> p1,
                     const AFEPack::Point<D> p2,
                     std::vector<int> d);
@@ -41,16 +42,17 @@ class RectangleDomain
     void initial_1D_rectangle_domain(double x0,double x1,int nx);
     void initial_2D_rectangle_domain(double x0,double x1,double y0,double y1,int nx,int ny);
     void initial_3D_rectangle_domain(double x0,double x1,double y0,double y1,double z0,double z1,int nx,int ny,int nz);
+    
     AFEPack::Point<D> get_bottom_left_point();
     AFEPack::Point<D> get_top_right_point();
-
     std::vector<int>  get_Divide_vector();
     int get_Divide(int rank);
-
     std::vector<double> get_interval_length();
     double get_interval_length(int rank);
     std::vector<double> get_point_coord(int rank);
     double get_point_coord(int rank,int dim);
+    std::string get_divide_mode(){return mode;};
+    void set_divide_mode(std::string m){mode=m;}
     void generate_mesh();
     void read_RectangleDomain_Data(std::string s);
 
