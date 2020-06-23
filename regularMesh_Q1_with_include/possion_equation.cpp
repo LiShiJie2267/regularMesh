@@ -1,8 +1,15 @@
 /**
- * @file   possion_equation.cpp
- * @author Li ShiJie <lsj@lsj>
- * @date   Tue Jun  13 18:11:56 2020
+ * @file possion_equation.cpp
+ * @author Lishijie (lsj1018845759@outlook.com)
+ * @brief 抛弃了version　0.1里过多的宏定义，使用设计好的RectangleDomain类进行实现；
+ * @version 0.2
+ * @date 2020-06-23
  * 
+ * @copyright Copyright (c) 2020
+ */
+/**
+ * @file   possion_equation.cpp
+ * @author Lishijie (lsj1018845759@outlook.com)
  * @brief  利用AFEPack里的函数以及功能，划分结构化网格，使用双线性四节点基函数
  * 		　　，实现Possion方程编值问题计算．
  * 			说明：
@@ -19,7 +26,12 @@
  * 			6、定义宏函数global_to_coord(global_index,n,h)，计算整体编号和节点坐标之间的关系，其中global_index为整体编号；
  * 			7、定义宏函数可以减少结构化代码重复次数，同时可以提高程序的复用性和可读性；
  *			8、最后手动计算L2误差，by王老师。
- */			
+ * @version 0.1
+ * @date   2020-06-13
+ * 
+ * @copyright Copyright (c) 2020
+ */		
+
 #include <iostream>
 #include <cmath>
 #include <utility>

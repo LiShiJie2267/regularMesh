@@ -12,10 +12,10 @@ LDFLAGS += -L/usr/local/AFEPack/library/lib -lAFEPack
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 main : $(object)
-	$(CXX) -o $@ possion_equation.o ../include/RectangleDomain.o $(LDFLAGS) $(LIBS)
+	$(CXX) -o $@ possion_equation.o ../obj/RectangleDomain.o $(LDFLAGS) $(LIBS)
 
 debug :main
-	$(CXX) -o $@ possion_equation.o ../include/RectangleDomain.o $(LDFLAGS) $(LIBS) -g
+	$(CXX) -o $@ possion_equation.o ../obj/RectangleDomain.o $(LDFLAGS) $(LIBS) -g
 clean :
 	-rm -rf $(object)
 	-rm -rf main
