@@ -9,10 +9,11 @@ LDFLAGS += -L/usr/local/AFEPack/library/lib -lAFEPack
 #all : 
 %.o : %.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	mv $@ ../obj/
 main : $(object)
-	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS)
+	$(CXX) -o $@ ../obj/*.o $(LDFLAGS) $(LIBS) 
 debug : main
-	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS) -g
+	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS) -g -I ../obj/*.o
 
 clean : 
 	-rm -rf $(object)
@@ -23,3 +24,4 @@ clean :
 	-rm -f debug
 
 .PHONY : default clean
+
