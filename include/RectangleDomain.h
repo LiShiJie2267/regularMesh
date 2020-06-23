@@ -1,3 +1,13 @@
+/**
+ * @file RectangleDomain.h
+ * @author Lishijie (lsj1018845759@outlook.com)
+ * @brief 实现矩形区域初始化，并可以实现网格划分.
+ * @version 0.1
+ * @date 2020-06-23
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 #ifndef _RECTANGLEDOMAIN_H_
 #define _RECTANGLEDOMAIN_H_
 
@@ -15,7 +25,10 @@ typedef std::map<pointcoord,unsigned int > loacl_to_global_map;
 typedef loacl_to_global_map::iterator index_iterator;
 typedef std::vector<loacl_to_global_map>  RectangleDomain_Mesh;
 typedef std::vector<loacl_to_global_map>::iterator element_iterator;
-
+/**
+ * @brief 矩形区域模板类，模板参数为D，表示矩形区域维度；
+ * 
+ */
 TEMPLATE_RECTANGLEDOMAIN
 class RectangleDomain
 {
@@ -27,38 +40,183 @@ class RectangleDomain
     RectangleDomain_Mesh Mesh;
     std::string mode;
     public:
-
+    /**
+     * @brief Construct a new Rectangle Domain object
+     * 
+     */
     RectangleDomain();
+    /**
+     * @brief Construct a new Rectangle Domain object
+     * 
+     * @param p1 矩形区域左下角点
+     * @param p2 矩形区域左下角点
+     * @param d  std::vector<int> 划分向量
+     */
     RectangleDomain(const AFEPack::Point<D> p1,
                     const AFEPack::Point<D> p2,
                     std::vector<int> d);
-                    
+    /**
+     * @brief Construct a new Rectangle Domain object
+     * 
+     * @param p1 矩形区域左下角点
+     * @param p2 矩形区域左下角点
+     * @param d  std::vector<int> 划分向量
+     * @param length std::vector<double> 向量
+     */
     RectangleDomain(const AFEPack::Point<D> p1,
                     const AFEPack::Point<D> p2,
                     std::vector<int> d,
                     std::vector<double> length);
-
+    /**
+     * @brief Destroy the Rectangle Domain object
+     * 
+     */
     ~RectangleDomain(){};
+
+    /**
+     * @brief 一维矩形计算区域初始化，可以直接利用RectangleDomain<1> domain
+     *        domain.initial_1D_rectangle_domain(x0,x1,nx)进行初始化；
+     * @param x0 右上角点x坐标；
+     * @param x1 右上角点x坐标；
+     * @param nx x方向上划分段数；
+     */
     void initial_1D_rectangle_domain(double x0,double x1,int nx);
+
+    /**
+     * @brief 二维矩形计算区域初始化，可以直接利用RectangleDomain<2> domain
+     *        domain.initial_2D_rectangle_domain(x0,x1，y0,y1,nx,ny)进行初始化；
+     * 
+     * @param x0 左下角点x坐标；
+     * @param x1 右上角点x坐标；
+     * @param y0 左下角点y坐标；
+     * @param y1 右上角点y坐标；
+     * @param nx x方向上划分段数；
+     * @param ny y方向上划分段数；
+     */
     void initial_2D_rectangle_domain(double x0,double x1,double y0,double y1,int nx,int ny);
+    /**
+     * @brief 三维矩形计算区域初始化，可以直接利用RectangleDomain<3> domain
+     *        domain.initial_3D_rectangle_domain(x0,x1,y0,y1,z1,z2,nx,ny,nz)进行初始化；
+     * 
+     * @param x0 左下角点x坐标；
+     * @param x1 右上角点x坐标；
+     * @param y0 左下角点y坐标；
+     * @param y1 右上角点y坐标；
+     * @param z0 左下角点z坐标；
+     * @param z1 右上角点z坐标；
+     * @param nx x方向上划分段数；
+     * @param ny y方向上划分段数；
+     * @param nz z方向上划分段数；
+     */
     void initial_3D_rectangle_domain(double x0,double x1,double y0,double y1,double z0,double z1,int nx,int ny,int nz);
     
+    /**
+     * @brief Get the bottom left point object
+     * 
+     * @return AFEPack::Point<D> 
+     */
     AFEPack::Point<D> get_bottom_left_point();
+    
+    /**
+     * @brief Get the top right point object
+     * 
+     * @return AFEPack::Point<D> 
+     */
     AFEPack::Point<D> get_top_right_point();
-    std::vector<int>  get_Divide_vector();
-    int get_Divide(int rank);
-    std::vector<double> get_interval_length();
-    double get_interval_length(int rank);
-    std::vector<double> get_point_coord(int rank);
-    double get_point_coord(int rank,int dim);
-    std::string get_divide_mode(){return mode;};
-    void set_divide_mode(std::string m){mode=m;}
-    void generate_mesh();
-    void read_RectangleDomain_Data(std::string s);
 
+    /**
+     * @brief Get the Divide vector object
+     * 
+     * @return std::vector<int> 
+     */
+    std::vector<int>  get_Divide_vector();
+
+    /**
+     * @brief Get the Divide object of rank
+     * 
+     * @param rank 维度
+     * @return int 
+     */
+    int get_Divide(int rank);
+
+    /**
+     * @brief Get the interval length object
+     * 
+     * @return std::vector<double> 
+     */
+    std::vector<double> get_interval_length();
+
+    /**
+     * @brief Get the interval length object of rank
+     * 
+     * @param rank 维度
+     * @return double 
+     */
+    double get_interval_length(int rank);
+
+    /**
+     * @brief Get the point coord of rank;
+     * 
+     * @param rank 节点编号
+     * @return std::vector<double> 
+     */
+    std::vector<double> get_point_coord(int rank);
+
+    /**
+     * @brief Get the point coord of rank in dimension dim; 
+     * 
+     * @param rank 节点编号
+     * @param dim 维度
+     * @return double 
+     */
+    double get_point_coord(int rank,int dim);
+
+    /**
+     * @brief Get the divide mode object
+     * 
+     * @return std::string 
+     */
+    std::string get_divide_mode(){return mode;};
+
+    /**
+     * @brief Set the divide mode object
+     * 
+     * @param m 划分模式
+     */
+    void set_divide_mode(std::string m){mode=m;}
+
+    /**
+     * @brief Generate the mesh with divide mode;
+     * 
+     */
+    void generate_mesh();
+
+    /**
+     * @brief 从文件s中读取矩形区域信息，进行初始化；
+     * 
+     * @param filename 文件名 
+     */
+    void read_RectangleDomain_Data(std::string filename);
+
+    /**
+     * @brief 重载输出运算符；
+     * 
+     * @tparam DIM 维度；
+     * @param out 输出形式；
+     * @param domain 待输出对象；
+     * @return std::ostream& 
+     */
     template <int DIM>
 	friend std::ostream& operator<<(std::ostream &out,RectangleDomain<DIM>& domain);
 
+    /**
+     * @brief 重载输入运算符；
+     * 
+     * @tparam DIM 维度
+     * @param in 输入格式
+     * @param domain 待输入对象；
+     * @return std::istream& 
+     */
     template <int DIM>
 	friend std::istream& operator>>(std::istream &in,RectangleDomain<DIM>& domain);
 };

@@ -1,4 +1,13 @@
-
+/**
+ * @file RectangleDomain.templates.h
+ * @author Lishijie (lsj1018845759@outlook.com)
+ * @brief 
+ * @version 0.1
+ * @date 2020-06-23
+ * 
+ * @copyright Copyright (c) 2020
+ * 
+ */
 #include "RectangleDomain.h"
 
 #define TEMPLATE template<int D>
@@ -356,10 +365,10 @@ double RectangleDomain<D>::get_point_coord(int rank,int dim)
 };
 
 TEMPLATE
-void RectangleDomain<D>::read_RectangleDomain_Data(std::string s)
+void RectangleDomain<D>::read_RectangleDomain_Data(std::string filename)
 {
     std::fstream input;
-    input.open(s);
+    input.open(filename);
     input>>(*this);
     
 
