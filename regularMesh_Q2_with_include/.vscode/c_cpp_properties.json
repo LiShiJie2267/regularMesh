@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/local/AFEPack/library/include",
+                "/usr/local/dealii-8.1.0/include/deal.II",
+                "/usr/local/dealii-8.1.0/include/deal.II/lac",
+                "/home/lsj/opencv-4.3.0/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "clang-x64"
+        }
+    ],
+    "version": 4
+}
