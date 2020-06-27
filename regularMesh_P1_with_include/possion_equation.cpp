@@ -1,11 +1,11 @@
 /**
- * @file   possion_equation.cpp
- * @author Li ShiJie <lsj@lsj>
- * @date   Tue Jun  10 12:34:11 2020
+ * @file possion_equation.cpp
+ * @author Lishijie (lsj1018845759@outlook.com)
+ * @brief  利用include文件夹里的RectangleDomain.h进行有限元计算；
+ * @version 0.1
+ * @date 2020-06-27
  * 
- * @brief  利用AFEPack里的函数以及功能，划分结构化网格，使用三角有限元三节点线性基函数
- * 		　　，实现Possion方程编值问题计算．
- * 
+ * @copyright Copyright (c) 2020
  * 
  */
 #include <iostream>
