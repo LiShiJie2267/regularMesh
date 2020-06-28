@@ -207,6 +207,18 @@ int RectangleDomain<D>::get_Divide(int rank)
 };
 
 TEMPLATE
+int RectangleDomain<D>::num_element()
+{
+    return Mesh.size();
+};
+
+TEMPLATE
+loacl_to_global_map RectangleDomain<D>::element(int rank)
+{
+    return Mesh[rank];
+};
+
+TEMPLATE
 std::vector<double> RectangleDomain<D>::get_interval_length()
 {
     return interval_length;

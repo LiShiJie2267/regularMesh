@@ -141,6 +141,19 @@ class RectangleDomain
     int get_Divide(int rank);
 
     /**
+     * @brief 返回第rank个element信息；
+     * 
+     */
+    loacl_to_global_map element(int rank);
+    
+    /**
+     * @brief 有限元单元个数;
+     * 
+     * @return int 
+     */
+    int num_element();
+
+    /**
      * @brief Get the interval length object
      * 
      * @return std::vector<double> 
@@ -186,6 +199,21 @@ class RectangleDomain
      */
     void set_divide_mode(std::string m){mode=m;}
 
+    /**
+     * @brief 返回第rank个单元对应的初始迭代器；
+     * 
+     * @param rank 
+     * @return index_iterator 
+     */
+    index_iterator begin_of_element(int rank){return this->element(rank).begin();};
+
+    /**
+     * @brief 返回第rank个单元对应的末尾迭代器；
+     * 
+     * @param rank 
+     * @return index_iterator 
+     */
+    index_iterator end_of_element(int rank){return this->element(rank).end();};
     /**
      * @brief Generate the mesh with divide mode;
      * 

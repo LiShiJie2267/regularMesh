@@ -133,6 +133,13 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae667038a70977879a5919ae985b7f7fc"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#ae667038a70977879a5919ae985b7f7fc">get_Divide</a> (int rank)</td></tr>
 <tr class="memdesc:ae667038a70977879a5919ae985b7f7fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the Divide object of rank.  <a href="#ae667038a70977879a5919ae985b7f7fc">More...</a><br /></td></tr>
 <tr class="separator:ae667038a70977879a5919ae985b7f7fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a586fcca8f0e3433980a391bb6267a306"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a586fcca8f0e3433980a391bb6267a306"></a>
+loacl_to_global_map&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#a586fcca8f0e3433980a391bb6267a306">element</a> (int rank)</td></tr>
+<tr class="memdesc:a586fcca8f0e3433980a391bb6267a306"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回第rank个element信息； <br /></td></tr>
+<tr class="separator:a586fcca8f0e3433980a391bb6267a306"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada682e98c6cbbee815218d767e308bf1"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#ada682e98c6cbbee815218d767e308bf1">num_element</a> ()</td></tr>
+<tr class="memdesc:ada682e98c6cbbee815218d767e308bf1"><td class="mdescLeft">&#160;</td><td class="mdescRight">有限元单元个数;  <a href="#ada682e98c6cbbee815218d767e308bf1">More...</a><br /></td></tr>
+<tr class="separator:ada682e98c6cbbee815218d767e308bf1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c325653de584638a459f2de12d2adce"><td class="memItemLeft" align="right" valign="top">std::vector&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#a3c325653de584638a459f2de12d2adce">get_interval_length</a> ()</td></tr>
 <tr class="memdesc:a3c325653de584638a459f2de12d2adce"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the interval length object.  <a href="#a3c325653de584638a459f2de12d2adce">More...</a><br /></td></tr>
 <tr class="separator:a3c325653de584638a459f2de12d2adce"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -151,6 +158,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8b0cb964d7d71fd6cb1eead1a9bbd57d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#a8b0cb964d7d71fd6cb1eead1a9bbd57d">set_divide_mode</a> (std::string m)</td></tr>
 <tr class="memdesc:a8b0cb964d7d71fd6cb1eead1a9bbd57d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the divide mode object.  <a href="#a8b0cb964d7d71fd6cb1eead1a9bbd57d">More...</a><br /></td></tr>
 <tr class="separator:a8b0cb964d7d71fd6cb1eead1a9bbd57d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17d2440d985046795ffc4971587c6644"><td class="memItemLeft" align="right" valign="top">index_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#a17d2440d985046795ffc4971587c6644">begin_of_element</a> (int rank)</td></tr>
+<tr class="memdesc:a17d2440d985046795ffc4971587c6644"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回第rank个单元对应的初始迭代器；  <a href="#a17d2440d985046795ffc4971587c6644">More...</a><br /></td></tr>
+<tr class="separator:a17d2440d985046795ffc4971587c6644"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac163a648091ad02c67fa616d04683bd5"><td class="memItemLeft" align="right" valign="top">index_iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#ac163a648091ad02c67fa616d04683bd5">end_of_element</a> (int rank)</td></tr>
+<tr class="memdesc:ac163a648091ad02c67fa616d04683bd5"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回第rank个单元对应的末尾迭代器；  <a href="#ac163a648091ad02c67fa616d04683bd5">More...</a><br /></td></tr>
+<tr class="separator:ac163a648091ad02c67fa616d04683bd5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a00900a3fbc224aacf68683827ab7a860"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a00900a3fbc224aacf68683827ab7a860"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classRectangleDomain.html#a00900a3fbc224aacf68683827ab7a860">generate_mesh</a> ()</td></tr>
 <tr class="memdesc:a00900a3fbc224aacf68683827ab7a860"><td class="mdescLeft">&#160;</td><td class="mdescRight">Generate the mesh with divide mode;. <br /></td></tr>
@@ -293,6 +306,72 @@ Friends</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a class="anchor" id="a17d2440d985046795ffc4971587c6644"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">index_iterator RectangleDomain::begin_of_element </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>rank</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>返回第rank个单元对应的初始迭代器； </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rank</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>index_iterator </dd></dl>
+
+</div>
+</div>
+<a class="anchor" id="ac163a648091ad02c67fa616d04683bd5"></a>
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">index_iterator RectangleDomain::end_of_element </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>rank</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>返回第rank个单元对应的末尾迭代器； </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rank</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>index_iterator </dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a72cc8be931c6c37ab9dddb7511e35a99"></a>
 <div class="memitem">
 <div class="memproto">
@@ -688,6 +767,24 @@ Friends</h2></td></tr>
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a class="anchor" id="ada682e98c6cbbee815218d767e308bf1"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">TEMPLATE int RectangleDomain::num_element </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>有限元单元个数; </p>
+<dl class="section return"><dt>Returns</dt><dd>int </dd></dl>
 
 </div>
 </div>
