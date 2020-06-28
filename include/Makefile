@@ -13,7 +13,7 @@ LDFLAGS += -L/usr/local/AFEPack/library/lib -lAFEPack
 main : $(object)
 	$(CXX) -o $@ ../obj/*.o $(LDFLAGS) $(LIBS) 
 debug : main
-	$(CXX) -o $@ $(object) $(LDFLAGS) $(LIBS) -g -I ../obj/*.o
+	$(CXX) -o $@ ../obj/*.o $(LDFLAGS) $(LIBS) -g -I ../obj/*.o
 
 clean : 
 	-rm -rf $(object)

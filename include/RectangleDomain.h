@@ -38,6 +38,7 @@ class RectangleDomain
     std::vector<int> Divide_vector;
     std::vector<double> interval_length;
     RectangleDomain_Mesh Mesh;
+    std::vector<double> boundary;
     std::string mode;
     public:
     /**
@@ -192,6 +193,12 @@ class RectangleDomain
     void generate_mesh();
 
     /**
+     * @brief Generate the boundary of this rectangle domain;
+     * 
+     */
+    void generate_boundary();
+    
+    /**
      * @brief 从文件s中读取矩形区域信息，进行初始化；
      * 
      * @param filename 文件名 
@@ -227,6 +234,7 @@ std::ostream& operator<<(std::ostream &out,RectangleDomain<DIM>& domain)
     out<<"---------The Rectangle Domain-----------"<<std::endl;
     out<<"The dimension of this rectangle domain is : "<<DIM<<std::endl;
     out<<"                                            "<<std::endl;
+    out<<"The divide mode of this rectangle domain is : "<<domain.mode<<std::endl; 
     switch (DIM)
     {
     case 1:
@@ -254,7 +262,7 @@ std::ostream& operator<<(std::ostream &out,RectangleDomain<DIM>& domain)
         out<<"The length of each interval in y direction is : "<< domain.interval_length[1]<<std::endl;
         out<<"                                              "<<std::endl;
         out<<"---The point coord in this rectangle domain mesh---"<<std::endl;
-        for(int i = 0;i < (domain.Divide_vector[0] + 1) * (domain.Divide_vector[1] + 1);i++)
+        for(int i = 0;i < (2 * domain.Divide_vector[0] + 1) * (2 * domain.Divide_vector[1] + 1);i++)
         {   
             std::cout<<"This point coord of "<<i<<" th is :";
             std::cout<<" ( "<<domain.get_point_coord(i,0)<<" , "<<domain.get_point_coord(i,1)<<" ) "<<std::endl;

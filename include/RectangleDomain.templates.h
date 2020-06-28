@@ -346,8 +346,16 @@ std::vector<double> RectangleDomain<D>::get_point_coord(int rank)
         get_1Dpointcoord(Divide_vector[0],bottom_left_point[0],top_right_point[0],rank);
         break;
     case 2:
-        get_2Dpointcoord(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],rank);
+        if(mode=="Q1"||mode=="P1")
+        {
+            get_2Dpointcoord(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                            top_right_point[1],rank);
+        }
+        else if(mode=="Q2"||mode=="P2")
+        {
+            get_2Dpointcoord(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                            top_right_point[1],rank);
+        }
         break;
     case 3:
         get_3Dpointcoord(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
@@ -370,7 +378,50 @@ void RectangleDomain<D>::read_RectangleDomain_Data(std::string filename)
     std::fstream input;
     input.open(filename);
     input>>(*this);
-    
-
 };
+
+TEMPLATE
+void RectangleDomain<D>::generate_boundary()
+{
+    switch (D)
+    {
+    case 1:
+        boundary.push_back(0);
+        boundary.push_back(Divide_vector[0]);
+        break;
+    case 2:
+    if(mode=="Q1"||mode=="P1")
+    {
+        for(int i = 0; i <= Divide_vector[0];i++)
+        {
+            boundary.push_back(i);
+            boundary.push_back((Divide_vector[0] + 1) * (Divide_vector[1] + 1)- i - 1);
+        }
+        for(int j = 1;j < Divide_vector[1];j++)
+        {
+            boundary.push_back((Divide_vector[0] + 1) * j);
+            boundary.push_back((Divide_vector[0] + 1) * j + Divide_vector[0]);
+        }
+    }
+    else if(mode=="Q2"||mode=="P2")
+    {
+        for(int i = 0; i <= 2 * Divide_vector[0];i++)
+        {
+            boundary.push_back(i);
+            boundary.push_back((2 * Divide_vector[0] + 1) * (2 * Divide_vector[1] + 1)- i - 1);
+        }
+        for(int j = 1;j < 2 * Divide_vector[1];j++)
+        {
+            boundary.push_back((2 * Divide_vector[0] + 1) * j);
+            boundary.push_back((2 * Divide_vector[0] + 1) * j+ 2 * Divide_vector[0]);
+        }
+    }        
+        break;
+    case 3:
+
+        break;
+    default:
+        break;
+    }
+}
 

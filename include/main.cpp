@@ -1,3 +1,11 @@
+/*
+ * @Description: 
+ * @Version: 2.0
+ * @Autor: Seven
+ * @Date: 2020-06-14 21:07:15
+ * @LastEditors: Seven
+ * @LastEditTime: 2020-06-28 13:28:20
+ */ 
 
 #include "RectangleDomain.h"
 #include <vector>
@@ -11,16 +19,8 @@ int main()
 
     RectangleDomain<2> mesh2D;
     mesh2D.initial_2D_rectangle_domain(0.0,1.0,0.0,1.0,2,2);
-    mesh2D.set_divide_mode("P1");
+    mesh2D.set_divide_mode("Q2");
     mesh2D.generate_mesh();
+    mesh2D.generate_boundary();
     std::cout<<mesh2D<<std::endl;
-
-    RectangleDomain<3> mesh3D;
-    mesh3D.initial_3D_rectangle_domain(0.0,1.0,0.0,1.0,0.0,1.0,2,2,2);
-    mesh3D.generate_mesh();
-    std::cout<<mesh3D<<std::endl;
-
-    RectangleDomain<2> m;
-    m.read_RectangleDomain_Data("input.txt");
-    std::cout<<m;
 }

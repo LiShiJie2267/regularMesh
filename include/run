@@ -1,3 +1,11 @@
+###
+ # @Description: 
+ # @Version: 2.0
+ # @Autor: Seven
+ # @Date: 2020-06-22 21:24:47
+ # @LastEditors: Seven
+ # @LastEditTime: 2020-06-28 13:25:55
+### 
 #! /bin/sh
 
 export AFEPACK_PATH="/usr/local/AFEPack"

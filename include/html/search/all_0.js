@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['generate_5fboundary',['generate_boundary',['../classRectangleDomain.html#ae2ed5ab6850ce77d08f10ec724596e02',1,'RectangleDomain']]],
   ['generate_5fmesh',['generate_mesh',['../classRectangleDomain.html#a00900a3fbc224aacf68683827ab7a860',1,'RectangleDomain']]],
   ['get_5fbottom_5fleft_5fpoint',['get_bottom_left_point',['../classRectangleDomain.html#a72cc8be931c6c37ab9dddb7511e35a99',1,'RectangleDomain']]],
   ['get_5fdivide',['get_Divide',['../classRectangleDomain.html#ae667038a70977879a5919ae985b7f7fc',1,'RectangleDomain']]],
