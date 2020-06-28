@@ -1,11 +1,11 @@
 /**
- * @file possion_equation.cpp
- * @author Lishijie (lsj1018845759@outlook.com)
- * @brief  利用include文件夹里的RectangleDomain.h进行有限元计算；
- * @version 0.1
- * @date 2020-06-27
+ * @file   possion_equation.cpp
+ * @author Li ShiJie <lsj@lsj>
+ * @date   Tue Jun  10 12:34:11 2020
  * 
- * @copyright Copyright (c) 2020
+ * @brief  利用AFEPack里的函数以及功能，划分结构化网格，使用三角有限元三节点线性基函数
+ * 		　　，实现Possion方程编值问题计算．
+ * 
  * 
  */
 #include <iostream>
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     double x1 = 1.0;
     double y1 = 1.0;
 	/// 设置剖分断数和节点总数
-    int n = 50;
+    int n = 40;
 	int nx = n;
 	int ny = n;
 	double h = (x1 - x0)/ n;
@@ -95,6 +95,7 @@ int main(int argc, char* argv[])
 	domain.set_divide_mode("P1");
 	domain.initial_2D_rectangle_domain(x0,x1,y0,y1,nx,ny);
 	domain.generate_mesh();
+	domain.generate_boundary();
 	int dim = ( domain.get_Divide( 0 ) + 1 ) * ( domain.get_Divide( 1 ) + 1 );
 	Vector<double> rhs(dim);
 	std::vector<unsigned int> nozeroperow(dim);
@@ -143,39 +144,34 @@ int main(int argc, char* argv[])
 	}
 	//stiff_mat.print_formatted(std::cout);
 	///处理所有边界条件
-	for(unsigned int index=0;index < dim;index++)
+	for(auto& index:domain.boundary)
 	{
-		if(nozeroperow[index]==3||nozeroperow[index]==4)
-		{	
-			int x_num=index%(n+1);
-			int y_num=index/(n+1);
-			double x=x_num*h;	
-			double y=y_num*h;
-			SparseMatrix<double>::iterator row_iterator = stiff_mat.begin(index);
-    	    SparseMatrix<double>::iterator row_end = stiff_mat.end(index);
-    	    double diag = row_iterator->value();
-			AFEPack::Point<2> bnd_point;
-			bnd_point[0]=x;
-			bnd_point[1]=y;
-    	    double bnd_value = u(bnd_point);
-            rhs(index) = diag * bnd_value;
-    	    for ( ++row_iterator; row_iterator != row_end; ++row_iterator)
-            {
-            	row_iterator->value() = 0.0;
-    			int k = row_iterator->column();
-                SparseMatrix<double>::iterator col_iterator = stiff_mat.begin(k);   
-                SparseMatrix<double>::iterator col_end = stiff_mat.end(k);
-    	    	for (++col_iterator; col_iterator != col_end; ++col_iterator)
-    				if (col_iterator->column() == index)
-    			    	break;
+		double x = domain.get_point_coord(index,0);
+		double y = domain.get_point_coord(index,1);
+		SparseMatrix<double>::iterator row_iterator = stiff_mat.begin(index);
+    	SparseMatrix<double>::iterator row_end = stiff_mat.end(index);
+    	double diag = row_iterator->value();
+		AFEPack::Point<2> bnd_point;
+		bnd_point[0]=x;
+		bnd_point[1]=y;
+    	double bnd_value = u(bnd_point);
+        rhs(index) = diag * bnd_value;
+    	for ( ++row_iterator; row_iterator != row_end; ++row_iterator)
+        {
+            row_iterator->value() = 0.0;
+    		int k = row_iterator->column();
+            SparseMatrix<double>::iterator col_iterator = stiff_mat.begin(k);   
+            SparseMatrix<double>::iterator col_end = stiff_mat.end(k);
+    	    for (++col_iterator; col_iterator != col_end; ++col_iterator)
+    			if (col_iterator->column() == index)
+    			    break;
     			if (col_iterator == col_end)
     			{
     				std::cerr << "Error!" << std::endl;
     				exit(-1);
     			}
     			rhs(k) -= col_iterator->value() * bnd_value;
-    			col_iterator->value() = 0.0;	
-            }  
+    			col_iterator->value() = 0.0;	  
 		}
 	}
 
@@ -201,5 +197,21 @@ int main(int argc, char* argv[])
 	}
 	fs<<"]"<<std::endl;
 	fs<<"surf(x,y,U);"<<std::endl;
+	double error = 0.0;
+    for(unsigned int index = 0; index < dim; index++)
+    {
+	int x_num = index % (n + 1);
+	int y_num = index / (n + 1);
+	double x = (x_num * h);	
+	double y = (y_num * h);
+	AFEPack::Point<2> pnt;
+	pnt[0] = x;
+	pnt[1] = y;
+
+	double d = (u(pnt) - solution[index]);
+	error += d*d;
+    }
+    error = std::sqrt(error);
+    std::cerr << "\nL2 error = " << error << ", tol = " << tol << std::endl;
     return 0;
 };
