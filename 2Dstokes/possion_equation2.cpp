@@ -8,27 +8,127 @@
  * @copyright Copyright (c) 2020
  * 
  */
-
-#include <iostream>
-#include <cmath>
-#include <utility>
-#include <vector>
-#include <unordered_map>
-#include <map>
+#include "../include/RectangleDomain.h"
 #include <AFEPack/AMGSolver.h>
 #include <AFEPack/Geometry.h>
 #include <AFEPack/TemplateElement.h>
 #include <AFEPack/FEMSpace.h>
 #include <AFEPack/Operator.h>
 #include <AFEPack/Functional.h>
-#include <AFEPack/SparseMatrixTool.h>
+#include <AFEPack/EasyMesh.h>
+
 #include <lac/sparse_matrix.h>
 #include <lac/sparsity_pattern.h>
+#include <lac/sparse_mic.h>
+#include <lac/sparse_ilu.h>
 #include <lac/vector.h>
-#include <lac/precondition.h>
+#include <lac/full_matrix.h>
+#include <lac/solver_cg.h>
 #include <lac/solver_minres.h>
 #include <lac/solver_gmres.h>
-#include "../include/RectangleDomain.h"
+#include <lac/precondition.h>
+
+#include <lac/trilinos_sparse_matrix.h>
+#include <lac/trilinos_block_sparse_matrix.h>
+#include <lac/trilinos_vector.h>
+#include <lac/trilinos_block_vector.h>
+#include <lac/trilinos_precondition.h>
+
+#define PI (4.0*atan(1.0))
+
+//#define N 2
+
+#define DIM 2
+
+double u(const double *);
+double f(const double *);
+double zfun(const double *);
+
+class StokesPreconditioner
+{
+private:
+    const SparseMatrix<double> *Ax; /**< 预处理矩阵各分块. */
+    const SparseMatrix<double> *Ay;
+    const SparseMatrix<double> *Q;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditionerX;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditionerY;
+    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG> Amg_preconditionerQ;
+
+public:
+    StokesPreconditioner()
+	{};
+
+    ~StokesPreconditioner()
+	{};
+
+    /** 
+     * 预处理子初始化.
+     * 
+     * @param _stiff_vx vx 空间的刚度矩阵. 
+     * @param _stiff_vy vy 空间的刚度矩阵.
+     * @param _mass_p_diag p 空间的质量矩阵的对角元. 
+     */
+    void initialize (const SparseMatrix<double> &_stiff_vx, 
+		     const SparseMatrix<double> &_stiff_vy, 
+		     const SparseMatrix<double> &_mass_p_diag) 
+	{
+	    Ax = &_stiff_vx;
+	    Ay = &_stiff_vy;
+	    Q = &_mass_p_diag;
+	    Amg_preconditionerX = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>(new TrilinosWrappers::PreconditionAMG());
+	    Amg_preconditionerX->initialize(*Ax);
+	    Amg_preconditionerY = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>(new TrilinosWrappers::PreconditionAMG());
+	    Amg_preconditionerY->initialize(*Ax);
+	    Amg_preconditionerQ = std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>(new TrilinosWrappers::PreconditionAMG());
+	    Amg_preconditionerQ->initialize(*Q);
+	};
+    /** 
+     * 实际估值 dst = M^{-1}src. 
+     * 
+     * @param dst 
+     * @param src 
+     */
+    void vmult (Vector<double> &dst,
+		const Vector<double> &src) const;
+};
+
+void StokesPreconditioner::vmult (Vector<double> &dst,
+				  const Vector<double> &src) const
+{
+    int n_dof_v = Ax->n();
+    int n_dof_p = Q->n();
+    Vector<double> d0(n_dof_v);
+    Vector<double> d1(n_dof_v);
+    Vector<double> s0(n_dof_v);
+    Vector<double> s1(n_dof_v);
+
+    Vector<double> d2(n_dof_p);
+    Vector<double> s2(n_dof_p);
+
+    for (int i = 0; i < n_dof_v; ++i)
+	s0(i) = src(i);
+    for (int i = 0; i < n_dof_v; ++i)
+	s1(i) = src(n_dof_v + i);
+    for (int i = 0; i < n_dof_p; ++i)
+	s2(i) = src(2 * n_dof_v + i);
+
+    SolverControl solver_control (100, 1e-3, false, false);
+    SolverCG<> solver (solver_control);
+
+    SolverControl solver_controlQ (100, 1e-6, false, false);
+    SolverCG<> solverQ (solver_controlQ);
+    
+    solver.solve (*Ax, d0, s0, *Amg_preconditionerX);
+    solver.solve (*Ay, d1, s1, *Amg_preconditionerY);
+    solverQ.solve (*Q, d2, s2, *Amg_preconditionerQ);
+
+    for (int i = 0; i < n_dof_v; ++i)
+	dst(i) = d0(i);
+    for (int i = 0; i < n_dof_v; ++i)
+	dst(n_dof_v + i) = d1(i);
+    for (int i = 0; i < n_dof_p; ++i)
+	dst(2 * n_dof_v + i) = d2(i);
+};
 
 #define PI (4.0*atan(1.0))
 //定义边界条件；
@@ -126,6 +226,7 @@ int main(int argc, char* argv[])
 	/// 生成网格，可以用domain.Mesh进行操作；由于处于测试版本，Mesh为public可改进；
 	/// 这里网格生成的默认格式为四边形(二维情况)或六面体(三维情况)；可改进；
 	domain.generate_mesh();
+	domain.generate_boundary();
 	/// 设置剖分断数和节点总数
 	int dim = ( domain.get_Divide( 0 ) + 1 ) * ( domain.get_Divide( 1 ) + 1 );
     /// nozeroperow中每一个值表示对应行数非零元素个数
@@ -133,6 +234,7 @@ int main(int argc, char* argv[])
 	domain2.initial_2D_rectangle_domain(x0,x1,y0,y1,nx,ny);
 	domain2.set_divide_mode("Q2");
 	domain2.generate_mesh();
+	domain2.generate_boundary();
 	int dim2=( 2 * domain2.get_Divide( 0 ) + 1 ) * ( 2 * domain2.get_Divide( 1 ) + 1 );
 	int dimension= 2*dim2+dim;
 	std::vector<unsigned int> nozeroperow(dimension);
@@ -287,22 +389,25 @@ int main(int argc, char* argv[])
 		++it_b2;	
 	}
 	
-	for (int i = 0; i < dim2; i++)
+	for (auto& i:domain2.boundary)
     {	
-    	if (nozeroperow[i] == 9 + dim||nozeroperow[i] == 15 + dim)
-    	{
-    	    SparseMatrix<double>::iterator row_iterator = stiff_mat.begin(i);
-    	    SparseMatrix<double>::iterator row_end = stiff_mat.end(i);
-    	    double diag = row_iterator->value();
-			double bnd_value = 0.0;
-            rhs(i) = diag * bnd_value;
-    	    for (++row_iterator; row_iterator != row_end; ++row_iterator)
-            {
-            	row_iterator->value() = 0.0;
-    			int k = row_iterator->column();
-                SparseMatrix<double>::iterator col_iterator = stiff_mat.begin(k);   
-                SparseMatrix<double>::iterator col_end = stiff_mat.end(k);   
-    	    	for (++col_iterator; col_iterator != col_end; ++col_iterator)
+    	double x=domain2.get_point_coord(i,0);
+		double y=domain2.get_point_coord(i,1);
+    	SparseMatrix<double>::iterator row_iterator = stiff_mat.begin(i);
+    	SparseMatrix<double>::iterator row_end = stiff_mat.end(i);
+    	double diag = row_iterator->value();
+		AFEPack::Point<2>  bnd_point;
+		bnd_point[0]=x;
+		bnd_point[1]=y;
+		double bnd_value = zfun(bnd_point);
+        rhs(i) = diag * bnd_value;
+    	for (++row_iterator; row_iterator != row_end; ++row_iterator)
+        {
+            row_iterator->value() = 0.0;
+    		int k = row_iterator->column();
+            SparseMatrix<double>::iterator col_iterator = stiff_mat.begin(k);   
+            SparseMatrix<double>::iterator col_end = stiff_mat.end(k);   
+    	    for (++col_iterator; col_iterator != col_end; ++col_iterator)
 		    if (col_iterator->column() == i)
 			break;
     		if (col_iterator == col_end)
@@ -325,21 +430,22 @@ int main(int argc, char* argv[])
     	    	int k = row_iterator->column();
                 SparseMatrix<double>::iterator col_iterator = stiff_mat.begin(k);   
                 SparseMatrix<double>::iterator col_end = stiff_mat.end(k);   
-    	    	for (++col_iterator; col_iterator != col_end; ++col_iterator)
-				{
-		    		if (col_iterator->column() == i + dim2)
-					break;
-				}
-    	    	if (col_iterator == col_end)
-    	    	{
-		    		std::cerr << "Error!" << std::endl;
-		    		exit(-1);
-    	    	}
-    	    	rhs(k) -= col_iterator->value() * bnd_value; 
-    	    	col_iterator->value() = 0.0;	
-            }  
-    	}	
+    	    for (++col_iterator; col_iterator != col_end; ++col_iterator)
+			{
+		    	if (col_iterator->column() == i + dim2)
+				break;
+			}
+    	    if (col_iterator == col_end)
+    	    {
+		    	std::cerr << "Error!" << std::endl;
+		    	exit(-1);
+    	    }
+    	    rhs(k) -= col_iterator->value() * bnd_value; 
+    	    col_iterator->value() = 0.0;	
+        }  
+    	
     }	
+	//stiff_mat.print_formatted(std::cout,1,false);
 	int n_v = dim2;
 	int n_p = dim;
 	int total_n_dof = dimension;
@@ -509,6 +615,8 @@ int main(int argc, char* argv[])
 
 	//stiff_mat.print_formatted(std::cout,2,false);
 	//AMGSolver solver(stiff_mat);
+	//Vector<double> solution(dimension);
+    //double tol = std::numeric_limits<double>::epsilon() * dimension;
     /// 这里设置线性求解器的收敛判定为机器 epsilon 乘以矩阵的阶数，也
     /// 就是自由度总数。这个参数基本上是理论可以达到的极限。
     //solver.solve(solution, rhs, tol, 10000);
@@ -536,4 +644,24 @@ int main(int argc, char* argv[])
 	}
 	fs<<"]"<<std::endl;
 	//fs<<"surf(x,y,U);"<<std::endl;*/
+	StokesPreconditioner preconditioner;
+    preconditioner.initialize(vxvx, vyvy, mass_p);
+    double tol = std::numeric_limits<double>::epsilon() * total_n_dof;
+    
+    SolverControl solver_control (1000000, tol, false);
+//  求解器的选择, Stokes系统是对称不定的, 不能采用cg, 如果使用GMRES, 效率比较低.
+//    SolverGMRES<Vector<double> > gmres(solver_control);
+//    gmres.solve (system_matrix, solution, rhs, PreconditionIdentity());	
+
+//  更好的求解器是专门处理对称不定系统的MinRes, 效率相对GMRES好很多.     
+    SolverMinRes<Vector<double> > minres(solver_control);
+//  然而不做任何预处理仍然是低效的.    
+//    minres.solve (system_matrix, solution, rhs, PreconditionIdentity());
+//  在最基本的情况下, 至少也应该做一个MIC预处理. 由于系统矩阵不定且右下角有零块, 因此
+//  必须对预处理阵的对角元加强以确保MIC能够完成. 对角强化参数是一个经验参数.     
+//    SparseMIC<double> mic;
+//    SparseMIC<double>::AdditionalData ad;
+//    ad.strengthen_diagonal = 0.5;
+//    mic.initialize(system_matrix, ad);
+    minres.solve (system_matrix, solution, rhs, preconditioner);
 };
