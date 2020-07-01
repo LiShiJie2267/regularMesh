@@ -356,6 +356,7 @@ void RectangleDomain<D>::generate_mesh()
         }
     break;
     case 3:
+    if(mode=="H1")
     for(int k = 0;k < Divide_vector[2];k++)
     for(int j = 0;j < Divide_vector[1];j++)
     for(int i = 0;i < Divide_vector[0];i++)
@@ -469,7 +470,27 @@ void RectangleDomain<D>::generate_boundary()
     }        
         break;
     case 3:
-
+    if(mode=="H1")
+    {
+        for(int j = 0 ;j <= Divide_vector[1];j++)
+        for(int i = 0 ;i <= Divide_vector[0];i++)
+        {
+            boundary.push_back(j * (Divide_vector[0] + 1) + i);
+            boundary.push_back((Divide_vector[0] + 1)*(Divide_vector[1] + 1)*(Divide_vector[2] + 1)-(j * (Divide_vector[0] + 1) + i)-1);
+        }
+        for(int k = 1;k < Divide_vector[2];k++)
+        for(int i = 0;i <= Divide_vector[0];i++)
+        {
+            boundary.push_back(k * (Divide_vector[0] + 1)*(Divide_vector[1] + 1) + i);
+            boundary.push_back((k + 1) * (Divide_vector[0] + 1)*(Divide_vector[1] + 1) -1 - i);
+        }
+        for(int k = 1;k < Divide_vector[2];k++)
+        for(int j = 1;j < Divide_vector[1];j++)
+        {
+            boundary.push_back(j*(Divide_vector[0]+1)+k*(Divide_vector[0]+1)*(Divide_vector[1]+1));
+            boundary.push_back(j*(Divide_vector[0]+1)+k*(Divide_vector[0]+1)*(Divide_vector[1]+1)+Divide_vector[0]);
+        }
+    }
         break;
     default:
         break;
