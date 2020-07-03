@@ -1,0 +1,15 @@
+###
+ # @Description: 
+ # @Version: 2.0
+ # @Autor: Seven
+ # @Date: 2020-07-01 14:30:40
+ # @LastEditors: Seven
+ # @LastEditTime: 2020-07-01 15:08:23
+### 
+#! /bin/sh
+
+export AFEPACK_PATH="/usr/local/AFEPack"
+export AFEPACK_TEMPLATE_PATH="$AFEPACK_PATH/template/hexahedron:$AFEPACK_PATH/template/tetrahedron"
+
+exec ./main $*
+
