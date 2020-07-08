@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
     double x1 = 1.0;
     double y1 = 1.0;
 	/// 设置剖分断数和节点总数
-    int n = 40;
+    int n = 25;
 	int nx = n;
 	int ny = n;
 	double h = (x1 - x0)/ n;
@@ -213,5 +213,32 @@ int main(int argc, char* argv[])
     }
     error = std::sqrt(error);
     std::cerr << "\nL2 error = " << error << ", tol = " << tol << std::endl;
-    return 0;
+    
+	std::ofstream f;
+	f.open("u.dx");
+	f<<"object 1 class array type float rank 1 shape 2 item "<<dim<<" data follows"<<std::endl;
+	for(int i = 0;i < dim;i++)
+		f<<domain.get_point_coord(i,0)<<" "<<domain.get_point_coord(i,1)<<std::endl;
+	f<<std::endl;
+	f<<"object 2 class array type int rank 1 shape 3 item "<<2*n*n<< " data follows"<<std::endl;
+	for(element_iterator it=domain.Mesh.begin();it!=domain.Mesh.end();++it)
+	{
+		for(index_iterator it2=it->begin();it2!=it->end();++it2)
+			f<<it2->second<<" ";
+		f<<std::endl;
+	}
+	f<<"attribute \"element type\" string \"triangles\""<<std::endl;
+	f<<"attribute \"ref\" string \"positions\""<<std::endl;
+	f<<std::endl;
+	f<<"object 3 class array type float rank 0 item "<<dim<<" data follows"<<std::endl;
+	for(int i = 0;i<dim;i++)
+		f<<solution(i)<<std::endl;
+	f<<"attribute \"dep\" string \"positions\""<<std::endl;
+	f<<std::endl;
+	f<<"object \"FEMFunction-2d\" class field"<<std::endl;
+	f<<"component \"positions\" value 1"<<std::endl;
+	f<<"component \"connections\" value 2"<<std::endl;
+	f<<"component \"data\" value 3"<<std::endl;
+	f<<"end"<<std::endl;
+	return 0;
 };
