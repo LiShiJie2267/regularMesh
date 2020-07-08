@@ -16,7 +16,7 @@ typedef std::pair<std::vector<double>,unsigned int > pointcoord;
 typedef std::map<pointcoord,unsigned int > loacl_to_global_map;
 typedef std::vector<loacl_to_global_map>  RectangleDomain_Mesh;
 
-#define generate_mesh1D(nx,x0,x1,i,local_index){\
+#define generate_mesh1D(nx,x0,x1,i,local_index,loacl_global_map){\
         double x = (((nx) - (i)) * x0 + (i) * x1) / (nx);\
         std::vector<double> point;\
         point.push_back(x);\
@@ -24,7 +24,7 @@ typedef std::vector<loacl_to_global_map>  RectangleDomain_Mesh;
         loacl_global_map[pc]=(i);\
 }
 
-#define generate_mesh2D(nx,ny,x0,x1,y0,y1,i,j,local_index){\
+#define generate_mesh2D(nx,ny,x0,x1,y0,y1,i,j,local_index,loacl_global_map){\
 		double x = ((nx - (i)) * x0 + (i) * x1) / (nx);\
 	    double y = ((ny - (j)) * y0 + (j) * y1) / (ny);\
         std::vector<double> point;\
@@ -34,7 +34,7 @@ typedef std::vector<loacl_to_global_map>  RectangleDomain_Mesh;
 		loacl_global_map[pc]=(j) * (nx + 1) + (i);\
 		}
 
-#define generate_mesh3D(nx,ny,nz,x0,x1,y0,y1,z0,z1,i,j,k,local_index){\
+#define generate_mesh3D(nx,ny,nz,x0,x1,y0,y1,z0,z1,i,j,k,local_index,loacl_global_map){\
 		double x = ((nx - (i)) * x0 + (i) * x1) / (nx);\
 	    double y = ((ny - (j)) * y0 + (j) * y1) / (ny);\
         double z = ((nz - (k)) * z0 + (k) * z1) / (nz);\
@@ -243,8 +243,8 @@ void RectangleDomain<D>::generate_mesh()
         for(int i = 0;i < Divide_vector[0];i++)
         {   
             loacl_to_global_map loacl_global_map;
-            generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i,0);
-            generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i + 1,1);
+            generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i,0,loacl_global_map);
+            generate_mesh1D(Divide_vector[0],bottom_left_point[0],top_right_point[0],i + 1,1,loacl_global_map);
             Mesh.push_back(loacl_global_map);
         }
     case 2:
@@ -254,13 +254,13 @@ void RectangleDomain<D>::generate_mesh()
         {
 		loacl_to_global_map loacl_global_map;
 		generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i,j,0);
+                        top_right_point[1],i,j,0,loacl_global_map);
 		generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i + 1,j,1);
+                        top_right_point[1],i + 1,j,1,loacl_global_map);
 		generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i + 1,j + 1,2);
+                        top_right_point[1],i + 1,j + 1,2,loacl_global_map);
 		generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i,j + 1,3);
+                        top_right_point[1],i,j + 1,3,loacl_global_map);
 		Mesh.push_back(loacl_global_map);
         }
     else if(mode=="Q2")
@@ -269,23 +269,23 @@ void RectangleDomain<D>::generate_mesh()
 		{
 		loacl_to_global_map loacl_global_map;
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],2 * i,2 * j,0);
+                        top_right_point[1],2 * i,2 * j,0,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),2 * j,1);
+                        top_right_point[1],(2 * i + 2),2 * j,1,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),(2 * j + 2),2);
+                        top_right_point[1],(2 * i + 2),(2 * j + 2),2,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],2 * i,(2 * j + 2),3);
+                        top_right_point[1],2 * i,(2 * j + 2),3,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),2 * j,4);
+                        top_right_point[1],(2 * i + 1),2 * j,4,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),(2 * j + 1),5);
+                        top_right_point[1],(2 * i + 2),(2 * j + 1),5,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),(2 * j + 2),6);
+                        top_right_point[1],(2 * i + 1),(2 * j + 2),6,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],2 * i,(2 * j + 1),7);
+                        top_right_point[1],2 * i,(2 * j + 1),7,loacl_global_map);
 		generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),(2 * j + 1),8);
+                        top_right_point[1],(2 * i + 1),(2 * j + 1),8,loacl_global_map);
 		Mesh.push_back(loacl_global_map);
 		}
     else if(mode=="P1")
@@ -295,24 +295,20 @@ void RectangleDomain<D>::generate_mesh()
 		{
         loacl_to_global_map loacl_global_map;
         generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i,j,0);
+                        top_right_point[1],i,j,0,loacl_global_map);
         generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i+1,j,1);
+                        top_right_point[1],i+1,j,1,loacl_global_map);
         generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i,j+1,2);
-        Mesh.push_back(loacl_global_map);       
-        }
-        for (int j = 0; j < Divide_vector[1]; j++)
-		for (int i = 0; i < Divide_vector[0]; i++)
-		{
-        loacl_to_global_map loacl_global_map;
+                        top_right_point[1],i,j+1,2,loacl_global_map);
+        Mesh.push_back(loacl_global_map);
+        loacl_to_global_map loacl_global_map1;
         generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(i + 1),(j + 1),0);
+                        top_right_point[1],(i + 1),(j + 1),0,loacl_global_map1);
         generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],i,(j + 1),1);
+                        top_right_point[1],i,(j + 1),1,loacl_global_map1);
         generate_mesh2D(Divide_vector[0],Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(i + 1),j,2);
-        Mesh.push_back(loacl_global_map);       
+                        top_right_point[1],(i + 1),j,2,loacl_global_map1);
+        Mesh.push_back(loacl_global_map1);        
         }
         }
     else if(mode=="P2")
@@ -322,38 +318,34 @@ void RectangleDomain<D>::generate_mesh()
 		{
         loacl_to_global_map loacl_global_map;
         generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],2 * i,2 * j,0);
+                        top_right_point[1],2 * i,2 * j,0,loacl_global_map);
         generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),2 * j,1);
+                        top_right_point[1],(2 * i + 2),2 * j,1,loacl_global_map);
         generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],2 * i,(2 * j + 2),2);
+                        top_right_point[1],2 * i,(2 * j + 2),2,loacl_global_map);
         generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),(2 * j + 1),3);
+                        top_right_point[1],(2 * i + 1),(2 * j + 1),3,loacl_global_map);
         generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i),(2 * j + 1),4);
+                        top_right_point[1],(2 * i),(2 * j + 1),4,loacl_global_map);
         generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),(2 * j),5);
-        Mesh.push_back(loacl_global_map);       
+                        top_right_point[1],(2 * i + 1),(2 * j),5,loacl_global_map);
+        Mesh.push_back(loacl_global_map);
+        loacl_to_global_map loacl_global_map1;
+        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 2),(2 * j + 2),0,loacl_global_map1);
+        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i),(2 * j + 2),1,loacl_global_map1);
+        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 2),(2 * j),2,loacl_global_map1);
+        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 1),(2 * j + 1),3,loacl_global_map1);
+        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 2),(2 * j + 1),4,loacl_global_map1);
+        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
+                        top_right_point[1],(2 * i + 1),(2 * j + 2),5,loacl_global_map1);
+        Mesh.push_back(loacl_global_map1);              
         }
-        for (int j = 0; j < Divide_vector[1]; j++)
-		for (int i = 0; i < Divide_vector[0]; i++)
-		{
-        loacl_to_global_map loacl_global_map;
-        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),(2 * j + 2),0);
-        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i),(2 * j + 2),1);
-        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),(2 * j),2);
-        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),(2 * j + 1),3);
-        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 2),(2 * j + 1),4);
-        generate_mesh2D(2 * Divide_vector[0],2 * Divide_vector[1],bottom_left_point[0],top_right_point[0],bottom_left_point[1],
-                        top_right_point[1],(2 * i + 1),(2 * j + 2),5);
-        Mesh.push_back(loacl_global_map);       
-        }
-        }
+        }  
     break;
     case 3:
     if(mode=="H1")
@@ -364,21 +356,21 @@ void RectangleDomain<D>::generate_mesh()
         int ele_idx=k * Divide_vector[2] * Divide_vector[1] + j * Divide_vector[0] + i;
         loacl_to_global_map loacl_global_map;
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k,1);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k,1,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,2);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,2,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k,3);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k,3,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k + 1,4);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k + 1,4,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,5);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,5,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k + 1,6);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k + 1,6,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,7);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,7,loacl_global_map);
         Mesh.push_back(loacl_global_map);
     }
     else if(mode=="T1")
@@ -389,74 +381,54 @@ void RectangleDomain<D>::generate_mesh()
     {
         loacl_to_global_map loacl_global_map;/// 0-1-2-5 型单元
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k,1);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k,1,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,2);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,2,loacl_global_map);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,3);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,3,loacl_global_map);
         Mesh.push_back(loacl_global_map);
-    }
-    for(int k = 0;k < Divide_vector[2];k++)
-    for(int j = 0;j < Divide_vector[1];j++)
-    for(int i = 0;i < Divide_vector[0];i++)
-    {
-        loacl_to_global_map loacl_global_map;/// 0-2-3-7 型单元
+        loacl_to_global_map loacl_global_map1;/// 0-2-3-7 型单元
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0,loacl_global_map1);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,1);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,1,loacl_global_map1);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k,2);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k,2,loacl_global_map1);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3);
-        Mesh.push_back(loacl_global_map);
-    }
-    for(int k = 0;k < Divide_vector[2];k++)
-    for(int j = 0;j < Divide_vector[1];j++)
-    for(int i = 0;i < Divide_vector[0];i++)
-    {
-        loacl_to_global_map loacl_global_map;/// 0-4-5-7 型单元
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3,loacl_global_map1);
+        Mesh.push_back(loacl_global_map1);
+        loacl_to_global_map loacl_global_map2;/// 0-4-5-7 型单元
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0,loacl_global_map2);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k + 1,1);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k + 1,1,loacl_global_map2);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,2);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,2,loacl_global_map2);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3);
-        Mesh.push_back(loacl_global_map);
-    }
-    for(int k = 0;k < Divide_vector[2];k++)
-    for(int j = 0;j < Divide_vector[1];j++)
-    for(int i = 0;i < Divide_vector[0];i++)
-    {
-        loacl_to_global_map loacl_global_map;/// 2-5-6-7 型单元
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3,loacl_global_map2);
+        Mesh.push_back(loacl_global_map2);
+        loacl_to_global_map loacl_global_map3;/// 2-5-6-7 型单元
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,0);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,0,loacl_global_map3);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,1);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,1,loacl_global_map3);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k + 1,2);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k + 1,2,loacl_global_map3);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3);
-        Mesh.push_back(loacl_global_map);
-    }
-    for(int k = 0;k < Divide_vector[2];k++)
-    for(int j = 0;j < Divide_vector[1];j++)
-    for(int i = 0;i < Divide_vector[0];i++)
-    {
-        loacl_to_global_map loacl_global_map;/// 0-5-2-7 型单元
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3,loacl_global_map3);
+        Mesh.push_back(loacl_global_map3);
+        loacl_to_global_map loacl_global_map4;/// 0-5-2-7 型单元
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j,k,0,loacl_global_map4);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,1);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j,k + 1,1,loacl_global_map4);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,2);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i + 1,j + 1,k,2,loacl_global_map4);
         generate_mesh3D(Divide_vector[0],Divide_vector[1],Divide_vector[2],bottom_left_point[0],top_right_point[0],
-                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3);
-        Mesh.push_back(loacl_global_map);
+                        bottom_left_point[1],top_right_point[1],bottom_left_point[2],top_right_point[2],i,j + 1,k + 1,3,loacl_global_map4);
+        Mesh.push_back(loacl_global_map4);  
     }
     }
     default:
